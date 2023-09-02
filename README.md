@@ -17,14 +17,11 @@ include(bs)
 bs_project(<project name>)
 
 ## Packages
-Call bs_generate_package(<package name>) in the CMakeLists.txt file
-within the current package folder with the name of the package.
+Call bs_generate_package(<package name>) in the CMakeLists.txt file within the current package folder with the name of the package.
 Provide any necessary targets that the package depend upon.
-Package interdependency is not managed and should be designed
-hierarchially by the user.
+Package interdependency is not managed and should be designed hierarchially by the user.
 
-Your package is expected to have a specific layout. Folders
-are scanned recursively.
+Your package is expected to have a specific layout. Folders are scanned recursively.
 
 ## Package folder layout of a package 'packagename'
   packagename
@@ -48,9 +45,8 @@ are scanned recursively.
   * common (source folder for tests)
   * data (test data folder accessed in tests with \"./tests/data\")
 
-Platform specific packages are named as the following
- <package name><CONFIG_PLATFORM> and depend on the platform agnostic
- package <package name> by default
+Platform specific packages are named as the following 
+ <package name><CONFIG_PLATFORM> and depend on the platform agnostic package <package name> by default
 
 ## Example package CMakeLists.txt file
 cmake_minimum_required (VERSION 3.0.2)
