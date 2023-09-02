@@ -25,7 +25,7 @@ Package interdependency is not managed and should be designed hierarchially by t
 
 Your package is expected to have a specific layout. Folders are scanned recursively.
 
-### Package folder layout of a package <packagename>
+### Package folder layout of a package 'packagename'
   packagename
   * include
   * source
