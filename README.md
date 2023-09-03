@@ -19,11 +19,13 @@ bs_project(<project name>)
 ```
 
 ### Packages
-Call `bs_generate_package(package_name)` in the `CMakeLists.txt` file within the current package folder with the name of the package.
-Provide any necessary targets that the package depend upon.
-Package interdependency is not managed and should be designed hierarchially by the user.
+Call `bs_generate_package()` in the `CMakeLists.txt` file within the current package folder with the name of the package.
+Provide any necessary dependencies (targets) that the package depend upon.
+The generator does not care if the target is internally or externally defined, any available targets can be utilized as dependencies.
+Package interdependency is not managed and should be designed hierarchially by the user to avoid circular dependencies.
 
-Your package is expected to have a specific layout. Folders are scanned recursively.
+Your packages are expected to have a specific layout. See below.
+All folders in a package are scanned recursively.
 
 ### Package folder layout of a package 'packagename'
   package_name
