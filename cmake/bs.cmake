@@ -1,8 +1,6 @@
 cmake_minimum_required (VERSION 3.0.2)
 
 function(bs_project major_version minor_version)
-	include(CTest)
-	enable_testing()
 	set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 	set(CMAKE_CXX_STANDARD 20 PARENT_SCOPE)
 	set(CXX_STANDARD_REQUIRED ON PARENT_SCOPE)
@@ -42,6 +40,8 @@ function(bs_copy_data relative_path)
 endfunction()
 
 function(bs_generate_package pkg_name deps)
+	include(CTest)
+	enable_testing()
 
 	set(CXX_STANDARD_REQUIRED ON)
 
