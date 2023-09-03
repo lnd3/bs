@@ -14,6 +14,10 @@ function(bs_project major_version minor_version)
 	set(CONFIG_PLATFORM ${platform_name} PARENT_SCOPE)
 endfunction()
 
+function(bs_truncate_path root_path full_path)
+	cmake_path(RELATIVE_PATH ${full_path} BASE_DIRECTORY ${root_path} OUTPUT_VARIABLE rel_path)
+	set(${full_path} ${rel_path} PARENT_SCOPE)
+endfunction()
 
 function(bs_internal_set_pedantic_flags pkg_name)
 	#target_compile_definitions(${LIBRARY_NAME_PLATFORM} PUBLIC cxx_std_17)
