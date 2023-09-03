@@ -26,15 +26,15 @@ function(bs_internal_set_pedantic_flags pkg_name)
 	endif()
 endfunction()
 
-function(bs_internal_copy_test_data pkg_name)
-	file(GLOB_RECURSE test_data_files 
-		${CMAKE_CURRENT_SOURCE_DIR}/tests/data/*.*)
+function(bs_copy_data relative_path)
+	file(GLOB_RECURSE data_files 
+		${CMAKE_CURRENT_SOURCE_DIR}/${relative_path}/*.*)
 
-	foreach(test_data_file ${test_data_files})
-		file(RELATIVE_PATH rel_path ${CMAKE_CURRENT_SOURCE_DIR} ${test_data_file})
-		if(EXISTS ${test_data_file})
+	foreach(data_file ${data_files})
+		file(RELATIVE_PATH rel_path ${CMAKE_CURRENT_SOURCE_DIR} ${data_file})
+		if(EXISTS ${data_file})
 			configure_file(
-				${test_data_file} 
+				${data_file} 
 				${CMAKE_CURRENT_BINARY_DIR}/${rel_path}
 				COPYONLY)
 		endif()
@@ -86,7 +86,7 @@ function(bs_generate_package pkg_name deps)
 			target_link_libraries(${TEST_LIBRARY_NAME} PUBLIC ${deps} ${LIBRARY_NAME})
 			add_test(NAME ${TEST_LIBRARY_NAME} COMMAND ${TEST_LIBRARY_NAME})
 			set_target_properties(${TEST_LIBRARY_NAME} PROPERTIES FOLDER "Packages")
-			bs_internal_copy_test_data(${TEST_LIBRARY_NAME})
+			bs_copy_data("tests/data")
 		endif()
 	endif()
 
@@ -122,7 +122,7 @@ function(bs_generate_package pkg_name deps)
 				target_link_libraries(${TEST_LIBRARY_NAME_PLATFORM} PUBLIC ${deps} ${LIBRARY_NAME} ${LIBRARY_NAME_PLATFORM})
 				add_test(NAME ${TEST_LIBRARY_NAME_PLATFORM} COMMAND ${TEST_LIBRARY_NAME_PLATFORM})
 				set_target_properties(${TEST_LIBRARY_NAME_PLATFORM} PROPERTIES FOLDER "Packages")
-				bs_internal_copy_test_data(${TEST_LIBRARY_NAME})
+				bs_copy_data("tests/data")
 			endif()
 		endif()
 	endif()
