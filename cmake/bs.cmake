@@ -19,7 +19,7 @@ function(bs_truncate_path root_path full_path)
 	set(${full_path} ${rel_path} PARENT_SCOPE)
 endfunction()
 
-function(bs_internal_set_pedantic_flags pkg_name)
+function(bs_set_pedantic_flags pkg_name)
 	#target_compile_definitions(${LIBRARY_NAME_PLATFORM} PUBLIC cxx_std_17)
 	if(MSVC)
 		target_compile_options(${pkg_name} PRIVATE /W4 /WX /EHsc)
