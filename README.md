@@ -2,13 +2,11 @@
 A project generation tool for library package modules and dependencies.
 
 ### Functions
-* `bs_project(<major version> <minor version>)`
-* `bs_generate_package(<package name> [<dependency targets>...])`
-* `bs_message(<message>)`
-
-### Internal functions
-* `bs_internal_set_pedantic_flags(<package name>)`
-* `bs_internal_copy_test_data(<package name>)`
+* `bs_project(<major_version> <minor_version>)`
+* `bs_generate_package(<pkg_name> [<dependency_target>...])`
+* `bs_truncate_path(<root_path> <full_path>)`
+* `bs_copy_data(<relative_path>)`
+* `bs_set_pedantic_flags(<pkg_name>)`
 
 ### Typical usage:
 ```
