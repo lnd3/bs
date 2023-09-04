@@ -81,7 +81,7 @@ function(bs_generate_package pkg_name deps)
 		)
 		set_target_properties(${LIBRARY_NAME} PROPERTIES FOLDER "Packages")
 
-		bs_internal_set_pedantic_flags(${LIBRARY_NAME})
+		bs_set_pedantic_flags(${LIBRARY_NAME})
 
 		# library common tests
 		if(test_common)
@@ -117,7 +117,7 @@ function(bs_generate_package pkg_name deps)
 			target_link_libraries(${LIBRARY_NAME_PLATFORM} PRIVATE ${LIBRARY_NAME})
 			set_target_properties(${LIBRARY_NAME_PLATFORM} PROPERTIES FOLDER "Packages")
 
-			bs_internal_set_pedantic_flags(${LIBRARY_NAME_PLATFORM})
+			bs_set_pedantic_flags(${LIBRARY_NAME_PLATFORM})
 
 			# library tests	
 			if(test_common)
