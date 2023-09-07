@@ -43,7 +43,7 @@ function(bs_copy_data relative_path)
 	endforeach()
 endfunction()
 
-function(bs_generate_package pkg_name deps)
+function(bs_generate_package pkg_name deps deps_include)
 	include(CTest)
 	enable_testing()
 
@@ -76,8 +76,10 @@ function(bs_generate_package pkg_name deps)
 	if(code_common OR include_common OR include_deps)
 		add_library(${LIBRARY_NAME} STATIC ${code_common} ${include_common})
 		target_include_directories(${LIBRARY_NAME} 
-			PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include
+			PUBLIC 
+			${CMAKE_CURRENT_SOURCE_DIR}/include
 			${include_deps}
+			${deps_include}
 		)
 		set_target_properties(${LIBRARY_NAME} PROPERTIES FOLDER "Packages")
 
@@ -111,8 +113,11 @@ function(bs_generate_package pkg_name deps)
 		if(code_platform OR include_deps)
 			add_library(${LIBRARY_NAME_PLATFORM} STATIC ${code_platform} ${include_platform})
 			target_include_directories(${LIBRARY_NAME_PLATFORM} 
-				PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/source/${CONFIG_PLATFORM}
-				PRIVATE ${include_deps}
+				PUBLIC 
+				${CMAKE_CURRENT_SOURCE_DIR}/source/${CONFIG_PLATFORM} 
+				${deps_include}
+				PRIVATE 
+				${include_deps}
 			)
 			target_link_libraries(${LIBRARY_NAME_PLATFORM} PRIVATE ${LIBRARY_NAME})
 			set_target_properties(${LIBRARY_NAME_PLATFORM} PROPERTIES FOLDER "Packages")
@@ -120,7 +125,7 @@ function(bs_generate_package pkg_name deps)
 			bs_set_pedantic_flags(${LIBRARY_NAME_PLATFORM})
 
 			# library tests	
-			if(test_common)
+			if(test_platform)
 				set(TEST_LIBRARY_NAME_PLATFORM "${LIBRARY_NAME_PLATFORM}_test")
 				add_executable(${TEST_LIBRARY_NAME_PLATFORM} ${test_platform})
 				target_link_libraries(${TEST_LIBRARY_NAME_PLATFORM} PUBLIC ${deps} ${LIBRARY_NAME} ${LIBRARY_NAME_PLATFORM})
