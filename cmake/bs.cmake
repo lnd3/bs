@@ -43,7 +43,7 @@ function(bs_copy_to_binary_dir relative_path)
 	endforeach()
 endfunction()
 
-function(bs_generate_package pkg_name deps deps_include)
+function(bs_generate_package pkg_name tier deps deps_include)
 	include(CTest)
 	enable_testing()
 
@@ -81,7 +81,7 @@ function(bs_generate_package pkg_name deps deps_include)
 			${include_deps}
 			${deps_include}
 		)
-		set_target_properties(${LIBRARY_NAME} PROPERTIES FOLDER "Packages")
+		set_target_properties(${LIBRARY_NAME} PROPERTIES FOLDER "Packages/${tier}")
 
 		bs_set_pedantic_flags(${LIBRARY_NAME})
 
@@ -91,7 +91,7 @@ function(bs_generate_package pkg_name deps deps_include)
 			add_executable(${TEST_LIBRARY_NAME} ${test_common})
 			target_link_libraries(${TEST_LIBRARY_NAME} PUBLIC ${deps} ${LIBRARY_NAME})
 			add_test(NAME ${TEST_LIBRARY_NAME} COMMAND ${TEST_LIBRARY_NAME})
-			set_target_properties(${TEST_LIBRARY_NAME} PROPERTIES FOLDER "Packages")
+			set_target_properties(${TEST_LIBRARY_NAME} PROPERTIES FOLDER "Packages/${tier}")
 			bs_copy_to_binary_dir("tests/data")
 		endif()
 	endif()
@@ -120,7 +120,7 @@ function(bs_generate_package pkg_name deps deps_include)
 				${include_deps}
 			)
 			target_link_libraries(${LIBRARY_NAME_PLATFORM} PRIVATE ${LIBRARY_NAME})
-			set_target_properties(${LIBRARY_NAME_PLATFORM} PROPERTIES FOLDER "Packages")
+			set_target_properties(${LIBRARY_NAME_PLATFORM} PROPERTIES FOLDER "Packages/${tier}")
 
 			bs_set_pedantic_flags(${LIBRARY_NAME_PLATFORM})
 
@@ -130,7 +130,7 @@ function(bs_generate_package pkg_name deps deps_include)
 				add_executable(${TEST_LIBRARY_NAME_PLATFORM} ${test_platform})
 				target_link_libraries(${TEST_LIBRARY_NAME_PLATFORM} PUBLIC ${deps} ${LIBRARY_NAME} ${LIBRARY_NAME_PLATFORM})
 				add_test(NAME ${TEST_LIBRARY_NAME_PLATFORM} COMMAND ${TEST_LIBRARY_NAME_PLATFORM})
-				set_target_properties(${TEST_LIBRARY_NAME_PLATFORM} PROPERTIES FOLDER "Packages")
+				set_target_properties(${TEST_LIBRARY_NAME_PLATFORM} PROPERTIES FOLDER "Packages/${tier}")
 				bs_copy_to_binary_dir("tests/data")
 			endif()
 		endif()
