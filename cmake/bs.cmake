@@ -31,13 +31,11 @@ function(bs_copy_to_binary_dir relative_path)
 endfunction()
 
 # bs main api
-function(bs_project major_version minor_version)
+function(bs_init)
 	set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 	set(CMAKE_CXX_STANDARD 20 PARENT_SCOPE)
 	set(CXX_STANDARD_REQUIRED ON PARENT_SCOPE)
-	set(VERSION_MAJOR ${major_version} PARENT_SCOPE)
-	set(VERSION_MINOR ${minor_version} PARENT_SCOPE)
-	set(TEST_ROOT ${PROJECT_SOURCE_DIR} PARENT_SCOPE)
+	set(BS_ROOT_DIR ${PROJECT_SOURCE_DIR} PARENT_SCOPE)
 
 	# The platform folder must be identical to CONFIG_PLATFORM for platform source to be found
 	# This also affects the platform target name similarly
@@ -45,7 +43,7 @@ function(bs_project major_version minor_version)
 	set(BS_CONFIG_PLATFORM ${platform_name} PARENT_SCOPE)
 endfunction()
 
-function(bs_setup package_rel_dir used_packages)
+function(bs_configure_packages package_rel_dir used_packages)
 	# add all package libraries directories
 
 	foreach(packageName ${used_packages})
