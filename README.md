@@ -64,5 +64,5 @@ and depend on the platform agnostic package `<pkg_name>` by default
 cmake_minimum_required (VERSION 3.0.2)
 project(<pkg_name>)
 set(deps [<library targets>...])
-bs_generate_package(tools "${deps}")
+bs_generate_package(<pkg_name> "${deps}")
 ```
