@@ -1,6 +1,8 @@
 # bs
 A project generation tool for library package modules and dependencies.
 
+The main feature of `bs` is to provide a simpler interface (compared to raw cmake) to construct hierarchial project dependencies with as little cmake interaction as possible.
+
 ### Main functions
 * `bs_init()`
 * `bs_configure_packages(<package_rel_dir> [<used_package>...])`
