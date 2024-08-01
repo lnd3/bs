@@ -1,19 +1,6 @@
 cmake_minimum_required (VERSION 3.0.2)
 
-function(bs_project major_version minor_version)
-	set_property(GLOBAL PROPERTY USE_FOLDERS ON)
-	set(CMAKE_CXX_STANDARD 20 PARENT_SCOPE)
-	set(CXX_STANDARD_REQUIRED ON PARENT_SCOPE)
-	set(VERSION_MAJOR ${major_version} PARENT_SCOPE)
-	set(VERSION_MINOR ${minor_version} PARENT_SCOPE)
-	set(TEST_ROOT ${PROJECT_SOURCE_DIR} PARENT_SCOPE)
-
-	# The platform folder must be identical to CONFIG_PLATFORM for platform source to be found
-	# This also affects the platform target name similarly
-	string(TOLOWER ${CMAKE_SYSTEM_NAME} platform_name)
-	set(CONFIG_PLATFORM ${platform_name} PARENT_SCOPE)
-endfunction()
-
+# bs support functions
 function(bs_truncate_path root_path full_path)
 	cmake_path(RELATIVE_PATH ${full_path} BASE_DIRECTORY ${root_path} OUTPUT_VARIABLE rel_path)
 	set(${full_path} ${rel_path} PARENT_SCOPE)
@@ -41,6 +28,57 @@ function(bs_copy_to_binary_dir relative_path)
 				COPYONLY)
 		endif()
 	endforeach()
+endfunction()
+
+# bs main api
+function(bs_project major_version minor_version)
+	set_property(GLOBAL PROPERTY USE_FOLDERS ON)
+	set(CMAKE_CXX_STANDARD 20 PARENT_SCOPE)
+	set(CXX_STANDARD_REQUIRED ON PARENT_SCOPE)
+	set(VERSION_MAJOR ${major_version} PARENT_SCOPE)
+	set(VERSION_MINOR ${minor_version} PARENT_SCOPE)
+	set(TEST_ROOT ${PROJECT_SOURCE_DIR} PARENT_SCOPE)
+
+	# The platform folder must be identical to CONFIG_PLATFORM for platform source to be found
+	# This also affects the platform target name similarly
+	string(TOLOWER ${CMAKE_SYSTEM_NAME} platform_name)
+	set(BS_CONFIG_PLATFORM ${platform_name} PARENT_SCOPE)
+endfunction()
+
+function(bs_setup package_rel_dir used_packages)
+	# add all package libraries directories
+
+	foreach(packageName ${used_packages})
+		add_subdirectory(${package_rel_dir}/${packageName})
+	endforeach()
+
+	# list all library target names
+	foreach(packageName ${used_packages})
+		set(libraryName ${packageName})
+		if(TARGET ${libraryName})
+			list(APPEND LIB_NAMES ${libraryName})
+		endif()
+	endforeach()
+
+	# list all library target platform names
+	foreach(packageName ${used_packages})
+		set(libraryPlatformName ${packageName}${BS_CONFIG_PLATFORM})
+		if(TARGET ${libraryPlatformName})
+			list(APPEND LIB_PLATFORM_NAMES ${libraryPlatformName})
+		endif()
+	endforeach()
+
+	message("Generated common libraries: " )
+	foreach(packageName ${LIB_NAMES})
+		message("   ${packageName}")
+	endforeach()
+	message("Generated platform libraries: " )
+	foreach(packageName ${LIB_PLATFORM_NAMES})
+		message("   ${packageName}")
+	endforeach()
+
+	set(BS_LIB_NAMES ${LIB_NAMES} PARENT_SCOPE)
+	set(BS_LIB_PLATFORM_NAMES ${LIB_PLATFORM_NAMES} PARENT_SCOPE)
 endfunction()
 
 function(bs_generate_package pkg_name tier deps deps_include)
@@ -98,23 +136,23 @@ function(bs_generate_package pkg_name tier deps deps_include)
 
 	#### platform specific library configuration ####
 
-	if(EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/source/${CONFIG_PLATFORM})
+	if(EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/source/${BS_CONFIG_PLATFORM})
 		# library source and headers
-		file(GLOB_RECURSE include_platform ${CMAKE_CURRENT_SOURCE_DIR}/source/${CONFIG_PLATFORM}/*.h)
-		SOURCE_GROUP(TREE ${CMAKE_CURRENT_SOURCE_DIR}/source/${CONFIG_PLATFORM} PREFIX src FILES ${include_platform})
-		file(GLOB_RECURSE code_platform ${CMAKE_CURRENT_SOURCE_DIR}/source/${CONFIG_PLATFORM}/*.cpp)
-		SOURCE_GROUP(TREE ${CMAKE_CURRENT_SOURCE_DIR}/source/${CONFIG_PLATFORM} PREFIX src FILES ${code_platform})
-		file(GLOB_RECURSE test_platform ${CMAKE_CURRENT_SOURCE_DIR}/tests/${CONFIG_PLATFORM}/*.cpp ${CMAKE_CURRENT_SOURCE_DIR}/tests/${CONFIG_PLATFORM}/*.h)
-		SOURCE_GROUP(TREE ${CMAKE_CURRENT_SOURCE_DIR}/tests/${CONFIG_PLATFORM} PREFIX src FILES ${test_platform})
+		file(GLOB_RECURSE include_platform ${CMAKE_CURRENT_SOURCE_DIR}/source/${BS_CONFIG_PLATFORM}/*.h)
+		SOURCE_GROUP(TREE ${CMAKE_CURRENT_SOURCE_DIR}/source/${BS_CONFIG_PLATFORM} PREFIX src FILES ${include_platform})
+		file(GLOB_RECURSE code_platform ${CMAKE_CURRENT_SOURCE_DIR}/source/${BS_CONFIG_PLATFORM}/*.cpp)
+		SOURCE_GROUP(TREE ${CMAKE_CURRENT_SOURCE_DIR}/source/${BS_CONFIG_PLATFORM} PREFIX src FILES ${code_platform})
+		file(GLOB_RECURSE test_platform ${CMAKE_CURRENT_SOURCE_DIR}/tests/${BS_CONFIG_PLATFORM}/*.cpp ${CMAKE_CURRENT_SOURCE_DIR}/tests/${BS_CONFIG_PLATFORM}/*.h)
+		SOURCE_GROUP(TREE ${CMAKE_CURRENT_SOURCE_DIR}/tests/${BS_CONFIG_PLATFORM} PREFIX src FILES ${test_platform})
 	
-		set(LIBRARY_NAME_PLATFORM "${pkg_name}${CONFIG_PLATFORM}")
+		set(LIBRARY_NAME_PLATFORM "${pkg_name}${BS_CONFIG_PLATFORM}")
 
 		# platform library setup
 		if(code_platform OR include_deps)
 			add_library(${LIBRARY_NAME_PLATFORM} STATIC ${code_platform} ${include_platform})
 			target_include_directories(${LIBRARY_NAME_PLATFORM} 
 				PUBLIC 
-				${CMAKE_CURRENT_SOURCE_DIR}/source/${CONFIG_PLATFORM} 
+				${CMAKE_CURRENT_SOURCE_DIR}/source/${BS_CONFIG_PLATFORM} 
 				${deps_include}
 				PRIVATE 
 				${include_deps}
