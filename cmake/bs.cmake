@@ -125,7 +125,7 @@ function(bs_generate_package pkg_name tier deps deps_include)
 		if(test_common)
 			set(TEST_LIBRARY_NAME "${LIBRARY_NAME}_test")
 			add_executable(${TEST_LIBRARY_NAME} ${test_common})
-			target_link_libraries(${TEST_LIBRARY_NAME} PUBLIC ${LIBRARY_NAME} ${deps})
+			target_link_libraries(${TEST_LIBRARY_NAME} PUBLIC ${LIBRARY_NAME} ${deps}) # library before deps, see https://stackoverflow.com/questions/1517138/trying-to-include-a-library-but-keep-getting-undefined-reference-to-messages
 			add_test(NAME ${TEST_LIBRARY_NAME} COMMAND ${TEST_LIBRARY_NAME})
 			set_target_properties(${TEST_LIBRARY_NAME} PROPERTIES FOLDER "Packages/${tier}")
 			bs_copy_to_binary_dir("tests/data")
