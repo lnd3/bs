@@ -1,4 +1,4 @@
-cmake_minimum_required (VERSION 3.0.2)
+cmake_minimum_required (VERSION 3.21.7)
 
 # bs support functions
 function(bs_truncate_path root_path full_path)
