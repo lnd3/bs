@@ -40,13 +40,11 @@ function(bs_init)
 	# The platform folder must be identical to CONFIG_PLATFORM for platform source to be found
 	# This also affects the platform target name similarly
 	string(TOLOWER ${CMAKE_SYSTEM_NAME} platform_name)
-	string(TOLOWER ${CMAKE_SYSTEM_VERSION} platform_version)
-	string(TOLOWER ${CMAKE_SYSTEM_PROCESSOR} platform_processor)
 	set(BS_CONFIG_PLATFORM ${platform_name} PARENT_SCOPE)
 
-	message("##########################################################################################")
+	message("####################################################################################################")
 	message("             Initialized BS for platform '${CMAKE_SYSTEM_NAME}' version '${CMAKE_SYSTEM_VERSION}'")
-	message("##########################################################################################")
+	message("####################################################################################################")
 endfunction()
 
 function(bs_configure_packages package_rel_dir used_packages)
