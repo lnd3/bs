@@ -1,4 +1,4 @@
-cmake_minimum_required (VERSION 3.0.2)
+cmake_minimum_required (VERSION 3.21.7)
 
 # bs support functions
 function(bs_truncate_path root_path full_path)
@@ -41,6 +41,10 @@ function(bs_init)
 	# This also affects the platform target name similarly
 	string(TOLOWER ${CMAKE_SYSTEM_NAME} platform_name)
 	set(BS_CONFIG_PLATFORM ${platform_name} PARENT_SCOPE)
+
+	message("####################################################################################################")
+	message("             Initialized BS for platform '${CMAKE_SYSTEM_NAME}' version '${CMAKE_SYSTEM_VERSION}'")
+	message("####################################################################################################")
 endfunction()
 
 function(bs_configure_packages package_rel_dir used_packages)
@@ -117,6 +121,7 @@ function(bs_generate_package pkg_name tier deps deps_include)
 			${include_deps}
 			${deps_include}
 		)
+		target_compile_definitions(${LIBRARY_NAME} PUBLIC BSYSTEM_PLATFORM_${CMAKE_SYSTEM_NAME} BSYSTEM_PLATFORM="${CMAKE_SYSTEM_NAME}" BSYSTEM_VERSION="${CMAKE_SYSTEM_VERSION}" BSYSTEM_PROCESSOR="${CMAKE_SYSTEM_PROCESSOR}")
 		set_target_properties(${LIBRARY_NAME} PROPERTIES FOLDER "Packages/${tier}")
 
 		bs_set_pedantic_flags(${LIBRARY_NAME})
@@ -126,6 +131,7 @@ function(bs_generate_package pkg_name tier deps deps_include)
 			set(TEST_LIBRARY_NAME "${LIBRARY_NAME}_test")
 			add_executable(${TEST_LIBRARY_NAME} ${test_common})
 			target_link_libraries(${TEST_LIBRARY_NAME} PUBLIC ${LIBRARY_NAME} ${deps}) # library before deps, see https://stackoverflow.com/questions/1517138/trying-to-include-a-library-but-keep-getting-undefined-reference-to-messages
+			target_compile_definitions(${TEST_LIBRARY_NAME} PUBLIC BSYSTEM_PLATFORM_${CMAKE_SYSTEM_NAME} BSYSTEM_PLATFORM="${CMAKE_SYSTEM_NAME}" BSYSTEM_VERSION="${CMAKE_SYSTEM_VERSION}" BSYSTEM_PROCESSOR="${CMAKE_SYSTEM_PROCESSOR}")
 			add_test(NAME ${TEST_LIBRARY_NAME} COMMAND ${TEST_LIBRARY_NAME})
 			set_target_properties(${TEST_LIBRARY_NAME} PROPERTIES FOLDER "Packages/${tier}")
 			bs_copy_to_binary_dir("tests/data")
@@ -156,6 +162,7 @@ function(bs_generate_package pkg_name tier deps deps_include)
 				${include_deps}
 			)
 			target_link_libraries(${LIBRARY_NAME_PLATFORM} PRIVATE ${LIBRARY_NAME})
+			target_compile_definitions(${LIBRARY_NAME_PLATFORM} PUBLIC BSYSTEM_PLATFORM_${CMAKE_SYSTEM_NAME} BSYSTEM_PLATFORM="${CMAKE_SYSTEM_NAME}" BSYSTEM_VERSION="${CMAKE_SYSTEM_VERSION}" BSYSTEM_PROCESSOR="${CMAKE_SYSTEM_PROCESSOR}")
 			set_target_properties(${LIBRARY_NAME_PLATFORM} PROPERTIES FOLDER "Packages/${tier}")
 
 			bs_set_pedantic_flags(${LIBRARY_NAME_PLATFORM})
@@ -165,6 +172,7 @@ function(bs_generate_package pkg_name tier deps deps_include)
 				set(TEST_LIBRARY_NAME_PLATFORM "${LIBRARY_NAME_PLATFORM}_test")
 				add_executable(${TEST_LIBRARY_NAME_PLATFORM} ${test_platform})
 				target_link_libraries(${TEST_LIBRARY_NAME_PLATFORM} PUBLIC ${LIBRARY_NAME_PLATFORM} ${LIBRARY_NAME} ${deps})
+				target_compile_definitions(${TEST_LIBRARY_NAME_PLATFORM} PUBLIC BSYSTEM_PLATFORM_${CMAKE_SYSTEM_NAME} BSYSTEM_PLATFORM="${CMAKE_SYSTEM_NAME}" BSYSTEM_VERSION="${CMAKE_SYSTEM_VERSION}" BSYSTEM_PROCESSOR="${CMAKE_SYSTEM_PROCESSOR}")
 				add_test(NAME ${TEST_LIBRARY_NAME_PLATFORM} COMMAND ${TEST_LIBRARY_NAME_PLATFORM})
 				set_target_properties(${TEST_LIBRARY_NAME_PLATFORM} PROPERTIES FOLDER "Packages/${tier}")
 				bs_copy_to_binary_dir("tests/data")
