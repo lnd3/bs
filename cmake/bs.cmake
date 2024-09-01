@@ -97,11 +97,15 @@ function(bs_generate_package pkg_name tier deps deps_include)
 		if(TARGET ${dep})
 			get_target_property(dep_include ${dep} INTERFACE_INCLUDE_DIRECTORIES)
 			list(APPEND include_deps ${dep_include})
+			#message("dep: ${dep}")
+			#message("dep: ${dep_include}")
 		else()
 			message("¤¤¤¤ WARNING ${pkg_name} was missing target ${dep}")
 			list(REMOVE_ITEM deps ${dep})
 		endif()
 	endforeach()
+
+	#message("include_deps: ${include_deps}")
 
 	#### library setup ####
 	set(LIBRARY_NAME "${pkg_name}")
@@ -118,11 +122,10 @@ function(bs_generate_package pkg_name tier deps deps_include)
 	if(code_common OR include_common OR include_deps)
 		add_library(${LIBRARY_NAME} STATIC ${code_common} ${include_common})
 		target_include_directories(${LIBRARY_NAME} 
-			PUBLIC 
+			PUBLIC
 			${CMAKE_CURRENT_SOURCE_DIR}/include
-			${include_deps}
-			${deps_include}
 		)
+		target_link_libraries(${LIBRARY_NAME} PUBLIC ${deps})
 		target_compile_definitions(${LIBRARY_NAME} PUBLIC BSYSTEM_PLATFORM_${CMAKE_SYSTEM_NAME} BSYSTEM_PLATFORM="${CMAKE_SYSTEM_NAME}" BSYSTEM_VERSION="${CMAKE_SYSTEM_VERSION}" BSYSTEM_PROCESSOR="${CMAKE_SYSTEM_PROCESSOR}")
 		set_target_properties(${LIBRARY_NAME} PROPERTIES FOLDER "Packages/${tier}")
 
@@ -132,7 +135,7 @@ function(bs_generate_package pkg_name tier deps deps_include)
 		if(test_common)
 			set(TEST_LIBRARY_NAME "${LIBRARY_NAME}_test")
 			add_executable(${TEST_LIBRARY_NAME} ${test_common})
-			target_link_libraries(${TEST_LIBRARY_NAME} PUBLIC ${LIBRARY_NAME} ${deps}) # library before deps, see https://stackoverflow.com/questions/1517138/trying-to-include-a-library-but-keep-getting-undefined-reference-to-messages
+			target_link_libraries(${TEST_LIBRARY_NAME} PUBLIC ${LIBRARY_NAME}) # library before deps, see https://stackoverflow.com/questions/1517138/trying-to-include-a-library-but-keep-getting-undefined-reference-to-messages
 			target_compile_definitions(${TEST_LIBRARY_NAME} PUBLIC BSYSTEM_PLATFORM_${CMAKE_SYSTEM_NAME} BSYSTEM_PLATFORM="${CMAKE_SYSTEM_NAME}" BSYSTEM_VERSION="${CMAKE_SYSTEM_VERSION}" BSYSTEM_PROCESSOR="${CMAKE_SYSTEM_PROCESSOR}")
 			add_test(NAME ${TEST_LIBRARY_NAME} COMMAND ${TEST_LIBRARY_NAME})
 			set_target_properties(${TEST_LIBRARY_NAME} PROPERTIES FOLDER "Packages/${tier}")
@@ -159,11 +162,8 @@ function(bs_generate_package pkg_name tier deps deps_include)
 			target_include_directories(${LIBRARY_NAME_PLATFORM} 
 				PUBLIC 
 				${CMAKE_CURRENT_SOURCE_DIR}/source/${BS_CONFIG_PLATFORM} 
-				${deps_include}
-				PRIVATE 
-				${include_deps}
 			)
-			target_link_libraries(${LIBRARY_NAME_PLATFORM} PRIVATE ${LIBRARY_NAME})
+			target_link_libraries(${LIBRARY_NAME_PLATFORM} PRIVATE ${LIBRARY_NAME} ${deps})
 			target_compile_definitions(${LIBRARY_NAME_PLATFORM} PUBLIC BSYSTEM_PLATFORM_${CMAKE_SYSTEM_NAME} BSYSTEM_PLATFORM="${CMAKE_SYSTEM_NAME}" BSYSTEM_VERSION="${CMAKE_SYSTEM_VERSION}" BSYSTEM_PROCESSOR="${CMAKE_SYSTEM_PROCESSOR}")
 			set_target_properties(${LIBRARY_NAME_PLATFORM} PROPERTIES FOLDER "Packages/${tier}")
 
