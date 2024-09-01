@@ -83,7 +83,7 @@ function(bs_configure_packages package_rel_dir used_packages)
 	set(BS_LIB_PLATFORM_NAMES ${LIB_PLATFORM_NAMES} PARENT_SCOPE)
 endfunction()
 
-function(bs_generate_package pkg_name tier deps deps_include)
+function(bs_generate_package pkg_name tier deps deps_extern)
 	include(CTest)
 	enable_testing()
 
@@ -123,7 +123,7 @@ function(bs_generate_package pkg_name tier deps deps_include)
 			PUBLIC
 			${CMAKE_CURRENT_SOURCE_DIR}/include
 		)
-		target_link_libraries(${LIBRARY_NAME} PUBLIC ${deps})
+		target_link_libraries(${LIBRARY_NAME} PUBLIC ${deps} PRIVATE ${deps_extern})
 		target_compile_definitions(${LIBRARY_NAME} PUBLIC BSYSTEM_PLATFORM_${CMAKE_SYSTEM_NAME} BSYSTEM_PLATFORM="${CMAKE_SYSTEM_NAME}" BSYSTEM_VERSION="${CMAKE_SYSTEM_VERSION}" BSYSTEM_PROCESSOR="${CMAKE_SYSTEM_PROCESSOR}")
 		set_target_properties(${LIBRARY_NAME} PROPERTIES FOLDER "Packages/${tier}")
 
@@ -133,7 +133,7 @@ function(bs_generate_package pkg_name tier deps deps_include)
 		if(test_common)
 			set(TEST_LIBRARY_NAME "${LIBRARY_NAME}_test")
 			add_executable(${TEST_LIBRARY_NAME} ${test_common})
-			target_link_libraries(${TEST_LIBRARY_NAME} PUBLIC ${LIBRARY_NAME}) # library before deps, see https://stackoverflow.com/questions/1517138/trying-to-include-a-library-but-keep-getting-undefined-reference-to-messages
+			target_link_libraries(${TEST_LIBRARY_NAME} PUBLIC ${LIBRARY_NAME} ${deps_extern}) # library before deps, see https://stackoverflow.com/questions/1517138/trying-to-include-a-library-but-keep-getting-undefined-reference-to-messages
 			target_compile_definitions(${TEST_LIBRARY_NAME} PUBLIC BSYSTEM_PLATFORM_${CMAKE_SYSTEM_NAME} BSYSTEM_PLATFORM="${CMAKE_SYSTEM_NAME}" BSYSTEM_VERSION="${CMAKE_SYSTEM_VERSION}" BSYSTEM_PROCESSOR="${CMAKE_SYSTEM_PROCESSOR}")
 			add_test(NAME ${TEST_LIBRARY_NAME} COMMAND ${TEST_LIBRARY_NAME})
 			set_target_properties(${TEST_LIBRARY_NAME} PROPERTIES FOLDER "Packages/${tier}")
@@ -161,7 +161,7 @@ function(bs_generate_package pkg_name tier deps deps_include)
 				PUBLIC 
 				${CMAKE_CURRENT_SOURCE_DIR}/source/${BS_CONFIG_PLATFORM} 
 			)
-			target_link_libraries(${LIBRARY_NAME_PLATFORM} PRIVATE ${LIBRARY_NAME} ${deps})
+			target_link_libraries(${LIBRARY_NAME_PLATFORM} PRIVATE ${LIBRARY_NAME} ${deps_extern})
 			target_compile_definitions(${LIBRARY_NAME_PLATFORM} PUBLIC BSYSTEM_PLATFORM_${CMAKE_SYSTEM_NAME} BSYSTEM_PLATFORM="${CMAKE_SYSTEM_NAME}" BSYSTEM_VERSION="${CMAKE_SYSTEM_VERSION}" BSYSTEM_PROCESSOR="${CMAKE_SYSTEM_PROCESSOR}")
 			set_target_properties(${LIBRARY_NAME_PLATFORM} PROPERTIES FOLDER "Packages/${tier}")
 
