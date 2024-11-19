@@ -9,7 +9,7 @@ endfunction()
 function(bs_set_pedantic_flags pkg_name)
 	#target_compile_definitions(${LIBRARY_NAME_PLATFORM} PUBLIC cxx_std_17)
 	if(MSVC)
-		target_compile_options(${pkg_name} PRIVATE /W4 /WX /EHsc)
+		target_compile_options(${pkg_name} PRIVATE /W4 /WX)
 	else()
 		target_compile_options(${pkg_name} PRIVATE -Wall -Wextra -Wpedantic -Werror)
 	endif()
@@ -123,7 +123,7 @@ function(bs_generate_package pkg_name tier deps deps_extern)
 			PUBLIC
 			${CMAKE_CURRENT_SOURCE_DIR}/include
 		)
-		target_link_libraries(${LIBRARY_NAME} PRIVATE ${deps_extern} PUBLIC ${deps})
+		target_link_libraries(${LIBRARY_NAME} PUBLIC ${deps} PRIVATE ${deps_extern} )
 		target_compile_definitions(${LIBRARY_NAME} PUBLIC BSYSTEM_PLATFORM_${CMAKE_SYSTEM_NAME} BSYSTEM_PLATFORM="${CMAKE_SYSTEM_NAME}" BSYSTEM_VERSION="${CMAKE_SYSTEM_VERSION}" BSYSTEM_PROCESSOR="${CMAKE_SYSTEM_PROCESSOR}")
 		set_target_properties(${LIBRARY_NAME} PROPERTIES FOLDER "Packages/${tier}")
 
@@ -133,7 +133,7 @@ function(bs_generate_package pkg_name tier deps deps_extern)
 		if(test_common)
 			set(TEST_LIBRARY_NAME "${LIBRARY_NAME}_test")
 			add_executable(${TEST_LIBRARY_NAME} ${test_common})
-			target_link_libraries(${TEST_LIBRARY_NAME} PUBLIC ${deps_extern} ${LIBRARY_NAME}) # library before deps, see https://stackoverflow.com/questions/1517138/trying-to-include-a-library-but-keep-getting-undefined-reference-to-messages
+			target_link_libraries(${TEST_LIBRARY_NAME} PUBLIC ${LIBRARY_NAME} ${deps_extern}) # library before deps, see https://stackoverflow.com/questions/1517138/trying-to-include-a-library-but-keep-getting-undefined-reference-to-messages
 			target_compile_definitions(${TEST_LIBRARY_NAME} PUBLIC BSYSTEM_PLATFORM_${CMAKE_SYSTEM_NAME} BSYSTEM_PLATFORM="${CMAKE_SYSTEM_NAME}" BSYSTEM_VERSION="${CMAKE_SYSTEM_VERSION}" BSYSTEM_PROCESSOR="${CMAKE_SYSTEM_PROCESSOR}")
 			add_test(NAME ${TEST_LIBRARY_NAME} COMMAND ${TEST_LIBRARY_NAME})
 			set_target_properties(${TEST_LIBRARY_NAME} PROPERTIES FOLDER "Packages/${tier}")
@@ -161,7 +161,7 @@ function(bs_generate_package pkg_name tier deps deps_extern)
 				PUBLIC 
 				${CMAKE_CURRENT_SOURCE_DIR}/source/${BS_CONFIG_PLATFORM} 
 			)
-			target_link_libraries(${LIBRARY_NAME_PLATFORM} PRIVATE ${deps_extern} ${LIBRARY_NAME})
+			target_link_libraries(${LIBRARY_NAME_PLATFORM} PRIVATE ${LIBRARY_NAME} ${deps_extern})
 			target_compile_definitions(${LIBRARY_NAME_PLATFORM} PUBLIC BSYSTEM_PLATFORM_${CMAKE_SYSTEM_NAME} BSYSTEM_PLATFORM="${CMAKE_SYSTEM_NAME}" BSYSTEM_VERSION="${CMAKE_SYSTEM_VERSION}" BSYSTEM_PROCESSOR="${CMAKE_SYSTEM_PROCESSOR}")
 			set_target_properties(${LIBRARY_NAME_PLATFORM} PROPERTIES FOLDER "Packages/${tier}")
 
