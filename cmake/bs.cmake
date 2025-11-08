@@ -30,6 +30,52 @@ function(bs_copy_to_binary_dir relative_path)
 	endforeach()
 endfunction()
 
+function(bs_copy_shared_lib to_target lib_path)
+    if(WIN32)
+        set(shared_lib "${lib_path}.dll")
+    elseif(APPLE)
+        set(shared_lib "${lib_path}.dylib")
+    elseif(UNIX)
+        set(shared_lib "${lib_path}.so")
+    else()
+        message(WARNING "Unknown platform: skipping shared lib copy for target ${to_target}")
+        return()
+    endif()
+
+    message("package '${to_target}' copy shared object from : ${lib_path}")
+
+    add_custom_command(TARGET ${to_target} POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy_if_different
+            "${shared_lib}"
+            $<TARGET_FILE_DIR:${to_target}>
+        COMMENT "Copying ${shared_lib} to output directory of ${to_target}"
+    )
+endfunction()
+
+function(bs_copy_shared_libs_dir to_target lib_dir)
+    if(WIN32)
+        file(GLOB shared_libs "${lib_dir}/*.dll")
+    elseif(APPLE)
+        file(GLOB shared_libs "${lib_dir}/*.dylib")
+    elseif(UNIX)
+        file(GLOB shared_libs "${lib_dir}/*.so")
+    else()
+        message(WARNING "Unknown platform: skipping shared lib copy for target ${to_target}")
+        return()
+    endif()
+
+    message("package '${to_target}' copy shared objects from : ${lib_dir}")
+
+    foreach(lib ${shared_libs})
+        add_custom_command(TARGET ${to_target} POST_BUILD
+            COMMAND ${CMAKE_COMMAND} -E copy_if_different
+                "${lib}"
+                $<TARGET_FILE_DIR:${to_target}>
+            COMMENT "Copying ${lib} to output directory of ${to_target}"
+        )
+    endforeach()
+endfunction()
+
 # bs main api
 function(bs_init)
 	set_property(GLOBAL PROPERTY USE_FOLDERS ON)
